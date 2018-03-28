@@ -1,57 +1,63 @@
 const { Button, Led, Board, Sensor } = require('johnny-five')
-let onButton, offButton, led, potentiometer
 
-let state = {
-    isLEDOn: false,
-    potentiometerValue: null
-}
+const Arduino = () => {
+    let onButton, offButton, led, potentiometer
 
-const setState = object => {
-    state.assign(object)
-}
+    let state = {
+        isLEDOn: false,
+        potentiometerValue: null
+    }
 
-const board = new Board()
+    const setState = object => Object.assign(state, object)
 
-board.on('ready', () => {
-    led = new Led(9)
+    const board = new Board()
 
-    potentiometer = new Sensor({
-        pin: 'A0',
-        freq: 250
-    })
+    board.on('ready', () => {
+        //Define Buttons
+        led = new Led(9)
 
-    onButton = new Button({
-        pin: 2,
-        isPullup: true
-    })
-    offButton = new Button({
-        pin: 3,
-        isPullup: true
-    })
+        potentiometer = new Sensor({
+            pin: 'A0',
+            freq: 250
+        })
 
-    onButton.on('down', () => {
-        const { potentiometerValue } = state
-        led.on()
-        led.strobe(potentiometerValue)
-        setState({ isLEDOn: true })
-    })
-    offButton.on('down', () => {
-        led.stop().off()
-        setState({ isLEDOn: false })
-    })
+        onButton = new Button({
+            pin: 2,
+            isPullup: true
+        })
 
-    board.repl.inject({
-        pot: potentiometer
-    })
+        offButton = new Button({
+            pin: 3,
+            isPullup: true
+        })
 
-    potentiometer.on('data', function() {
-        if (state.potentiometerValue !== this.analog) {
-            if (state.isLEDOn) {
-                led.strobe(this.analog + 1)
+        onButton.on('down', () => {
+            const { potentiometerValue } = state
+            led.on()
+            led.strobe(potentiometerValue)
+            setState({ isLEDOn: true })
+        })
+
+        offButton.on('down', () => {
+            led.stop().off()
+            setState({ isLEDOn: false })
+        })
+
+        board.repl.inject({
+            pot: potentiometer
+        })
+
+        potentiometer.on('data', function() {
+            if (state.potentiometerValue !== this.analog) {
+                if (state.isLEDOn) {
+                    led.strobe(this.analog + 1)
+                }
+                setState({
+                    potentiometerValue: this.analog
+                })
             }
-            setState({
-                potentiometerValue: this.analog
-            })
-        }
+        })
     })
-})
+}
+
+module.exports = Arduino

@@ -1,9 +1,8 @@
 // const socketServer = () => {}
-
-const arduino = () => {}
+const Arduino = require('./arduino')
 
 // socketServer()
-arduino()
+Arduino()
 
 /*
 
