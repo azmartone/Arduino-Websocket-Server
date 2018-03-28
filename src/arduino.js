@@ -1,14 +1,21 @@
+const { isEqual } = require('lodash')
 const { Button, Led, Board, Sensor } = require('johnny-five')
 //Test
-const Arduino = () => {
+const Arduino = ({ onStateChange } = {}) => {
     let onButton, offButton, led, potentiometer
 
-    let state = {
+    let _state = {
         isLEDOn: false,
         potentiometerValue: null
     }
 
-    const setState = object => Object.assign(state, object)
+    const setState = object => {
+        const nextState = Object.assign({}, _state, object)
+        if (!isEqual(nextState, _state)) {
+            _state = nextState
+            handleStateChange(_state)
+        }
+    }
 
     const board = new Board()
 
@@ -32,7 +39,7 @@ const Arduino = () => {
         })
 
         onButton.on('down', () => {
-            const { potentiometerValue } = state
+            const { potentiometerValue } = _state
             led.on()
             led.strobe(potentiometerValue)
             setState({ isLEDOn: true })
@@ -48,16 +55,20 @@ const Arduino = () => {
         })
 
         potentiometer.on('data', function() {
-            if (state.potentiometerValue !== this.analog) {
-                if (state.isLEDOn) {
+            if (_state.potentiometerValue !== this.analog) {
+                if (_state.isLEDOn) {
                     led.strobe(this.analog + 1)
+                    setState({
+                        potentiometerValue: this.analog
+                    })
                 }
-                setState({
-                    potentiometerValue: this.analog
-                })
             }
         })
     })
+
+    const handleStateChange = state => {
+        if (typeof onStateChange === 'function') onStateChange(state)
+    }
 }
 
 module.exports = Arduino

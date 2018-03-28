@@ -1,8 +1,16 @@
+// import { on } from 'cluster'
+
 // const socketServer = () => {}
 const Arduino = require('./arduino')
 
 // socketServer()
-Arduino()
+console.log('what')
+
+Arduino({
+    onStateChange: state => {
+        console.log(state)
+    }
+})
 
 /*
 

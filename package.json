@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "johnny-five": "^0.14.2",
+    "lodash": "^4.17.5",
     "ws": "^5.1.0"
   },
   "devDependencies": {
