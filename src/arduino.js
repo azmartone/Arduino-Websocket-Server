@@ -2,6 +2,7 @@ const { isEqual } = require('lodash')
 const { Button, Led, Board, Sensor } = require('johnny-five')
 //Test
 const Arduino = ({ onStateChange } = {}) => {
+    console.log('Starting Arduino')
     let onButton, offButton, led, potentiometer
 
     let _state = {

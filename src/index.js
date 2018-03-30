@@ -1,14 +1,10 @@
-// import { on } from 'cluster'
-
-// const socketServer = () => {}
+const { HARDWARE_STATE_CHANGE } = require('./constants/socket')
+const SocketController = require('./SocketController')
 const Arduino = require('./arduino')
-
-// socketServer()
-console.log('what')
 
 Arduino({
     onStateChange: state => {
-        console.log(state)
+        SocketController.broadcast(HARDWARE_STATE_CHANGE, state)
     }
 })
 
